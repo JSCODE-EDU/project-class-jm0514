@@ -4,6 +4,8 @@ import com.toyboard.jeongmin.request.PostRequest;
 import com.toyboard.jeongmin.domain.Post;
 import com.toyboard.jeongmin.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,6 +24,7 @@ public class PostService {
         Post post = Post.builder()
                 .title(postRequest.getTitle())
                 .content(postRequest.getContent())
+                .regTime(postRequest.getRegTime())
                 .build();
 
         postrepository.save(post);
@@ -34,7 +37,10 @@ public class PostService {
     }
 
     public List<Post> findAllPosts(){
-        return postrepository.findAll();
+        PageRequest pageRequest =
+                PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
+
+        return postrepository.findAllPostsLimited100(pageRequest);
     }
 
     @Transactional
@@ -52,6 +58,12 @@ public class PostService {
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다"));
 
         postrepository.delete(post);
+    }
+
+    public List<Post> searchPostTitleList(String keyword) {
+        PageRequest pageRequest =
+                PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
+        return postrepository.findByTitleContainingOrderByRegTimeDesc(keyword, pageRequest);
     }
 
 }
