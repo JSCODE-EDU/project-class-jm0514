@@ -63,7 +63,7 @@ public class PostService {
     public List<Post> searchPostTitleList(String keyword) {
         PageRequest pageRequest =
                 PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
-        return postrepository.findByTitleContainingOrderByRegTimeDesc(keyword, pageRequest);
+        return postrepository.findByTitleKeyword(keyword, pageRequest);
     }
 
 }
