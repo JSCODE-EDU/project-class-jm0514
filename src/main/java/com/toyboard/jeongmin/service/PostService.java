@@ -33,23 +33,20 @@ public class PostService {
     }
 
     public PostResponse findPost(Long id){
-        Post post = postrepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
+        Post post = getFindByIdPost(id);
 
         return new PostResponse(post);
     }
 
     public List<Post> findAllPosts(){
-        PageRequest pageRequest =
-                PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, ("regTime")));
+        PageRequest pageRequest = getPageRequestLimited100DescRegTime();
 
         return postrepository.findAllPostsLimited100(pageRequest);
     }
 
     @Transactional
     public PostResponse modifyPost(Long id, PostRequest postRequest){
-        Post post = postrepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
+        Post post = getFindByIdPost(id);
 
         post.modify(postRequest.getTitle(), postRequest.getContent());
         return new PostResponse(post);
@@ -57,17 +54,23 @@ public class PostService {
 
     @Transactional
     public void deletePost(Long id){
-        Post post = postrepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다"));
-
+        Post post = getFindByIdPost(id);
         postrepository.delete(post);
     }
 
     public List<Post> searchPostTitleList(String keyword) {
-        PageRequest pageRequest =
-                PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
+        PageRequest pageRequest = getPageRequestLimited100DescRegTime();
 
         return postrepository.findByTitleKeyword(keyword, pageRequest);
+    }
+
+    private Post getFindByIdPost(Long id) {
+        return postrepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
+    }
+
+    private PageRequest getPageRequestLimited100DescRegTime() {
+        return PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
     }
 
 }
