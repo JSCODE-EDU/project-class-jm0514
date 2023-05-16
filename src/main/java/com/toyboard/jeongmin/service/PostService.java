@@ -3,6 +3,7 @@ package com.toyboard.jeongmin.service;
 import com.toyboard.jeongmin.request.PostRequest;
 import com.toyboard.jeongmin.domain.Post;
 import com.toyboard.jeongmin.repository.PostRepository;
+import com.toyboard.jeongmin.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -20,7 +21,7 @@ public class PostService {
     private final PostRepository postrepository;
 
     @Transactional
-    public Post writePost(PostRequest postRequest){
+    public PostResponse writePost(PostRequest postRequest){
         Post post = Post.builder()
                 .title(postRequest.getTitle())
                 .content(postRequest.getContent())
@@ -28,28 +29,30 @@ public class PostService {
                 .build();
 
         postrepository.save(post);
-        return post;
+        return new PostResponse(post);
     }
 
-    public Post findPost(Long id){
-        return postrepository.findById(id)
+    public PostResponse findPost(Long id){
+        Post post = postrepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
+
+        return new PostResponse(post);
     }
 
     public List<Post> findAllPosts(){
         PageRequest pageRequest =
-                PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
+                PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC, ("regTime")));
 
         return postrepository.findAllPostsLimited100(pageRequest);
     }
 
     @Transactional
-    public Post modifyPost(Long id, PostRequest postRequest){
+    public PostResponse modifyPost(Long id, PostRequest postRequest){
         Post post = postrepository.findById(id)
-                .orElseThrow(()->new EntityNotFoundException("존재하지 않는 게시글 입니다."));
+                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
 
         post.modify(postRequest.getTitle(), postRequest.getContent());
-        return post;
+        return new PostResponse(post);
     }
 
     @Transactional
@@ -63,6 +66,7 @@ public class PostService {
     public List<Post> searchPostTitleList(String keyword) {
         PageRequest pageRequest =
                 PageRequest.of(0, 100, Sort.by(Sort.Direction.DESC,("regTime")));
+
         return postrepository.findByTitleKeyword(keyword, pageRequest);
     }
 
