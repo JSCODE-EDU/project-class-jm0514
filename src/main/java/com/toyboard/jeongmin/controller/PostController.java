@@ -5,13 +5,15 @@ import com.toyboard.jeongmin.request.PostRequest;
 import com.toyboard.jeongmin.response.PostResponse;
 import com.toyboard.jeongmin.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/boards")
 @RequiredArgsConstructor
+@Slf4j
 public class PostController {
 
     private final PostService postService;
@@ -27,11 +29,6 @@ public class PostController {
         return new PostResponse(post);
     }
 
-    @GetMapping("/list")
-    public List<Post> getAllPost(){
-        return postService.findAllPosts();
-    }
-
     @PatchMapping("/{postId}")
     public PostResponse modifyPost(@PathVariable Long postId, @RequestBody PostRequest postRequest) {
         Post post = postService.modifyPost(postId, postRequest);
@@ -45,7 +42,11 @@ public class PostController {
 
     @GetMapping
     public List<Post> searchPostTitle(@RequestParam("keyword") String keyword){
-        return postService.searchPostTitleList(keyword);
+        if(keyword == null){
+            return postService.findAllPosts();
+        }else{
+            return postService.searchPostTitleList(keyword);
+        }
     }
 
 }
