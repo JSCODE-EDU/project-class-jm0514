@@ -1,5 +1,7 @@
 package com.toyboard.jeongmin.service;
 
+import com.toyboard.jeongmin.domain.Keyword;
+import com.toyboard.jeongmin.exception.PostNotFoundException;
 import com.toyboard.jeongmin.request.PostRequest;
 import com.toyboard.jeongmin.domain.Post;
 import com.toyboard.jeongmin.repository.PostRepository;
@@ -10,8 +12,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityNotFoundException;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -38,10 +40,12 @@ public class PostService {
         return new PostResponse(post);
     }
 
-    public List<Post> findAllPosts(){
+    public List<PostResponse> findAllPosts(){
         PageRequest pageRequest = getPageRequestLimited100DescRegTime();
 
-        return postrepository.findAllPostsLimited100(pageRequest);
+        return postrepository.findAllPostsLimited100(pageRequest).stream()
+                .map(post -> new PostResponse(post))
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -58,15 +62,18 @@ public class PostService {
         postrepository.delete(post);
     }
 
-    public List<Post> searchPostTitleList(String keyword) {
+    public List<PostResponse> searchPostTitleList(String keyword) {
         PageRequest pageRequest = getPageRequestLimited100DescRegTime();
+        Keyword validKeyword = Keyword.validKeyword(keyword);
 
-        return postrepository.findByTitleKeyword(keyword, pageRequest);
+        return postrepository.findByTitleKeyword(validKeyword.getValue(), pageRequest).stream()
+                .map(post -> new PostResponse(post))
+                .collect(Collectors.toList());
     }
 
     private Post getFindByIdPost(Long id) {
         return postrepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("존재하지 않는 게시글 입니다."));
+                .orElseThrow(() -> new PostNotFoundException());
     }
 
     private PageRequest getPageRequestLimited100DescRegTime() {
