@@ -1,12 +1,14 @@
 package com.toyboard.jeongmin.controller;
 
-import com.toyboard.jeongmin.domain.Post;
 import com.toyboard.jeongmin.request.PostRequest;
 import com.toyboard.jeongmin.response.PostResponse;
 import com.toyboard.jeongmin.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -22,27 +24,32 @@ public class PostController {
     }
 
     @PostMapping
-    public PostResponse createPost(@RequestBody PostRequest postRequest){
-        return postService.writePost(postRequest);
+    public ResponseEntity<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest){
+
+        PostResponse saveResponse = postService.writePost(postRequest);
+        return ResponseEntity.ok(saveResponse);
     }
 
     @PatchMapping("/{postId}")
-    public PostResponse modifyPost(@PathVariable Long postId, @RequestBody PostRequest postRequest) {
+    public PostResponse modifyPost(@PathVariable Long postId,
+                                   @Valid @RequestBody PostRequest postRequest) {
         return postService.modifyPost(postId, postRequest);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable Long postId){
+    public String deletePost(@PathVariable Long postId){
         postService.deletePost(postId);
+        return "해당 게시글이 삭제되었습니다!";
     }
 
     @GetMapping
-    public List<Post> searchPostTitle(@RequestParam("keyword") String keyword){
-        if(keyword == null){
-            return postService.findAllPosts();
-        }else{
-            return postService.searchPostTitleList(keyword);
-        }
+    public List<PostResponse> searchPostTitle(@RequestParam("keyword") String keyword){
+        return postService.searchPostTitleList(keyword);
+    }
+
+    @GetMapping("/list")
+    public List<PostResponse> findAllPost(){
+        return postService.findAllPosts();
     }
 
 }
