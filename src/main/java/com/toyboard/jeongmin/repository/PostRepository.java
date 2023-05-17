@@ -10,8 +10,8 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
 
-    @Query("select p from Post p where p.title like %:keyword%")
-    List<Post> findByTitleKeyword(@Param("keyword")String keyword, Pageable pageable);
+    @Query("select p from Post p where p.title.value like %:keyword%")
+    List<Post> findByTitleKeyword(@Param("keyword") String keyword, Pageable pageable);
 
     @Query("select p from Post p")
     List<Post> findAllPostsLimited100(Pageable pageable);
