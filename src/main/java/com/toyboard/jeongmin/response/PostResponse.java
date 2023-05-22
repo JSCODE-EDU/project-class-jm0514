@@ -18,9 +18,10 @@ public class PostResponse {
 
     public PostResponse(Post post) {
         this.id = post.getId();
-        this.title = post.getTitle();
-        this.content = post.getContent();
+        this.title = post.getTitle().getValue();
+        this.content = post.getContent().getValue();
         this.regTime = post.getRegTime();
     }
+
 
 }

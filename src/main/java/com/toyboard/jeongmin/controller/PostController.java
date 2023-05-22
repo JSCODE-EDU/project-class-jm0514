@@ -1,51 +1,55 @@
 package com.toyboard.jeongmin.controller;
 
-import com.toyboard.jeongmin.domain.Post;
 import com.toyboard.jeongmin.request.PostRequest;
 import com.toyboard.jeongmin.response.PostResponse;
 import com.toyboard.jeongmin.service.PostService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
-@RequestMapping("/board")
+@RequestMapping("/boards")
 @RequiredArgsConstructor
 public class PostController {
 
     private final PostService postService;
 
     @GetMapping("/{postId}")
-    public Post getPost(@PathVariable Long postId) {
+    public PostResponse getPost(@PathVariable Long postId) {
         return postService.findPost(postId);
     }
 
     @PostMapping
-    public PostResponse createPost(@RequestBody PostRequest postRequest){
-        Post post = postService.writePost(postRequest);
-        return new PostResponse(post);
-    }
+    public ResponseEntity<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest){
 
-    @GetMapping("/list")
-    public List<Post> getAllPost(){
-        return postService.findAllPosts();
+        PostResponse saveResponse = postService.writePost(postRequest);
+        return ResponseEntity.ok(saveResponse);
     }
 
     @PatchMapping("/{postId}")
-    public PostResponse modifyPost(@PathVariable Long postId, @RequestBody PostRequest postRequest) {
-        Post post = postService.modifyPost(postId, postRequest);
-        return new PostResponse(post);
+    public PostResponse modifyPost(@PathVariable Long postId,
+                                   @Valid @RequestBody PostRequest postRequest) {
+        return postService.modifyPost(postId, postRequest);
     }
 
     @DeleteMapping("/{postId}")
-    public void deletePost(@PathVariable Long postId){
+    public String deletePost(@PathVariable Long postId){
         postService.deletePost(postId);
+        return "해당 게시글이 삭제되었습니다!";
     }
 
     @GetMapping
-    public List<Post> searchPostTitle(@RequestParam("keyword") String keyword){
+    public List<PostResponse> searchPostTitle(@RequestParam("keyword") String keyword){
         return postService.searchPostTitleList(keyword);
+    }
+
+    @GetMapping("/list")
+    public List<PostResponse> findAllPost(){
+        return postService.findAllPosts();
     }
 
 }

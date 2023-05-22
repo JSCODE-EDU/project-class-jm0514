@@ -1,6 +1,6 @@
 package com.toyboard.jeongmin.domain;
 
-
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,31 +10,33 @@ import java.time.LocalDateTime;
 
 @Entity
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Post extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "post_id")
     private Long id;
 
-    private String title;
+    @Embedded
+    private Title title;
 
-    @Lob
-    private String content;
+    @Embedded
+    private Content content;
 
     private LocalDateTime regTime;
 
 
     @Builder
     public Post(String title, String content, LocalDateTime regTime) {
-        this.title = title;
-        this.content = content;
+        this.title = new Title(title);
+        this.content = new Content(content);
         this.regTime = LocalDateTime.now();
     }
 
     public void modify(String title, String content){
-        this.title = title;
-        this.content = content;
+        this.title = new Title(title);
+        this.content = new Content(content);
     }
 
 }
