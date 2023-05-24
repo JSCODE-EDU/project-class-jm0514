@@ -1,9 +1,7 @@
 package com.toyboard.jeongmin.advice;
 
-import com.toyboard.jeongmin.exception.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,19 +15,24 @@ public class PostExControllerAdvice {
                 .body(new ErrorResult(e.getMessage(), HttpStatus.BAD_REQUEST.value()));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResult> methodArgumentExHandle(BindingResult bindingResult){
-        String errorMessage = bindingResult.getFieldErrors()
-                .get(0)
-                .getDefaultMessage();
-
-        return ResponseEntity.badRequest().body(new ErrorResult(errorMessage));
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<ErrorResult> notFoundExHandle(NotFoundException e) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResult(e.getMessage(), HttpStatus.NOT_FOUND.value()));
     }
 
-    @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResult> unexpectedExHandle(RuntimeException e) {
-        return ResponseEntity.internalServerError().body(new ErrorResult("예상하지 못한 오류가 발생했습니다."
-                , HttpStatus.INTERNAL_SERVER_ERROR.value()));
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorResult> methodArgumentExHandle(MethodArgumentNotValidException e){
+        String errorMessage = e.getFieldError().getDefaultMessage();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResult(errorMessage, HttpStatus.BAD_REQUEST.value()));
+    }
+
+    @ExceptionHandler(InternalServerException.class)
+    public ResponseEntity<ErrorResult> unexpectedExHandle(InternalServerException e) {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                .body(new ErrorResult(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value()));
     }
 
 }
