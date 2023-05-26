@@ -15,7 +15,7 @@ public class Post extends BaseTimeEntity{
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    @Column(name = "post_id")
+    @Column(name = "post_id", nullable = false)
     private Long id;
 
     @Embedded
@@ -25,7 +25,6 @@ public class Post extends BaseTimeEntity{
     private Content content;
 
     private LocalDateTime regTime;
-
 
     @Builder
     public Post(String title, String content, LocalDateTime regTime) {
