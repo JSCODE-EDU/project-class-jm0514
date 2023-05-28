@@ -1,6 +1,6 @@
-package com.toyboard.jeongmin.domain;
+package com.toyboard.jeongmin.post.domain;
 
-import com.toyboard.jeongmin.exception.InvalidKeywordException;
+import com.toyboard.jeongmin.post.exception.InvalidKeywordException;
 import lombok.Getter;
 
 @Getter

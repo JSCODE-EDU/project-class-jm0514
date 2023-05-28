@@ -1,9 +1,9 @@
-package com.toyboard.jeongmin.controller;
+package com.toyboard.jeongmin.post.controller;
 
 import com.toyboard.jeongmin.advice.ErrorResult;
-import com.toyboard.jeongmin.request.PostRequest;
-import com.toyboard.jeongmin.response.PostResponse;
-import com.toyboard.jeongmin.service.PostService;
+import com.toyboard.jeongmin.post.request.PostRequest;
+import com.toyboard.jeongmin.post.response.PostResponse;
+import com.toyboard.jeongmin.post.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;

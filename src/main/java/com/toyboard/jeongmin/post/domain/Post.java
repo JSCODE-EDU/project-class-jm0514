@@ -1,4 +1,4 @@
-package com.toyboard.jeongmin.domain;
+package com.toyboard.jeongmin.post.domain;
 
 import lombok.AccessLevel;
 import lombok.Builder;

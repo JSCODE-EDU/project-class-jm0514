@@ -1,4 +1,4 @@
-package com.toyboard.jeongmin.exception;
+package com.toyboard.jeongmin.post.exception;
 
 import com.toyboard.jeongmin.advice.NotFoundException;
 

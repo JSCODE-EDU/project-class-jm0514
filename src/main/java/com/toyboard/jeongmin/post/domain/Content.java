@@ -1,6 +1,6 @@
-package com.toyboard.jeongmin.domain;
+package com.toyboard.jeongmin.post.domain;
 
-import com.toyboard.jeongmin.exception.InvalidContentException;
+import com.toyboard.jeongmin.post.exception.InvalidContentException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

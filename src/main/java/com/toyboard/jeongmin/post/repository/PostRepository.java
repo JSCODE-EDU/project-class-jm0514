@@ -1,6 +1,6 @@
-package com.toyboard.jeongmin.repository;
+package com.toyboard.jeongmin.post.repository;
 
-import com.toyboard.jeongmin.domain.Post;
+import com.toyboard.jeongmin.post.domain.Post;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

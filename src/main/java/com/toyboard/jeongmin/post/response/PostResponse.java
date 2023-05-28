@@ -1,6 +1,6 @@
-package com.toyboard.jeongmin.response;
+package com.toyboard.jeongmin.post.response;
 
-import com.toyboard.jeongmin.domain.Post;
+import com.toyboard.jeongmin.post.domain.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 

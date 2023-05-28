@@ -1,11 +1,11 @@
-package com.toyboard.jeongmin.service;
+package com.toyboard.jeongmin.post.service;
 
-import com.toyboard.jeongmin.domain.Keyword;
-import com.toyboard.jeongmin.exception.PostNotFoundException;
-import com.toyboard.jeongmin.request.PostRequest;
-import com.toyboard.jeongmin.domain.Post;
-import com.toyboard.jeongmin.repository.PostRepository;
-import com.toyboard.jeongmin.response.PostResponse;
+import com.toyboard.jeongmin.post.domain.Keyword;
+import com.toyboard.jeongmin.post.exception.PostNotFoundException;
+import com.toyboard.jeongmin.post.request.PostRequest;
+import com.toyboard.jeongmin.post.domain.Post;
+import com.toyboard.jeongmin.post.repository.PostRepository;
+import com.toyboard.jeongmin.post.response.PostResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
