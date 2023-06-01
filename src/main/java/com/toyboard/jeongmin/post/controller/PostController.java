@@ -76,7 +76,7 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = ErrorResult.class)))
     })
     @DeleteMapping("/{postId}")
-    public ResponseEntity deletePost(@Parameter(description = "게시글의 id", in = ParameterIn.PATH)
+    public ResponseEntity<String> deletePost(@Parameter(description = "게시글의 id", in = ParameterIn.PATH)
                              @PathVariable Long postId) {
 
         postService.deletePost(postId);
