@@ -1,7 +1,7 @@
 package com.toyboard.jeongmin.post.service;
 
 import com.toyboard.jeongmin.post.domain.Keyword;
-import com.toyboard.jeongmin.post.exception.PostNotFoundException;
+import com.toyboard.jeongmin.post.exception.NotFoundPostException;
 import com.toyboard.jeongmin.post.request.PostRequest;
 import com.toyboard.jeongmin.post.domain.Post;
 import com.toyboard.jeongmin.post.repository.PostRepository;
@@ -44,7 +44,7 @@ public class PostService {
         PageRequest pageRequest = getPageRequestLimited100DescRegTime();
 
         return postrepository.findAllPostsLimited100(pageRequest).stream()
-                .map(post -> new PostResponse(post))
+                .map(PostResponse::new)
                 .collect(Collectors.toList());
     }
 
@@ -67,13 +67,13 @@ public class PostService {
         Keyword validKeyword = Keyword.validKeyword(keyword);
 
         return postrepository.findByTitleKeyword(validKeyword.getValue(), pageRequest).stream()
-                .map(post -> new PostResponse(post))
+                .map(PostResponse::new)
                 .collect(Collectors.toList());
     }
 
     private Post getFindByIdPost(Long id) {
         return postrepository.findById(id)
-                .orElseThrow(() -> new PostNotFoundException());
+                .orElseThrow(NotFoundPostException::new);
     }
 
     private PageRequest getPageRequestLimited100DescRegTime() {
