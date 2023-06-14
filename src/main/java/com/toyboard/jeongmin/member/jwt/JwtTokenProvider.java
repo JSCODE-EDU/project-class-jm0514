@@ -70,13 +70,13 @@ public class JwtTokenProvider {
 
         Claims claims = parseClaims(accessToken);
 
-        if (claims.get("auth") == null) {
+        if (claims.get("roles") == null) {
             throw new RuntimeException("권한 정보가 없는 토큰입니다.");
         }
 
         // 클레임에서 권한 정보 가져오기
         Collection<? extends GrantedAuthority> authorities =
-                Arrays.stream(claims.get("auth").toString().split(","))
+                Arrays.stream(claims.get("roles").toString().split(","))
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
@@ -94,6 +94,8 @@ public class JwtTokenProvider {
         String bearerToken = request.getHeader("Authorization");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")){
             return bearerToken.substring(7);
+        } else if(request.getMethod().equals("GET") && bearerToken == null){
+            throw new JwtException("유효하지 않은 토큰입니다.");
         }
         return null;
     }
