@@ -1,6 +1,7 @@
 package com.toyboard.jeongmin.member.jwt;
 
 import com.toyboard.jeongmin.member.dto.LoginResponse;
+import com.toyboard.jeongmin.member.repository.MemberRepository;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,16 +9,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import javax.annotation.PostConstruct;
 import javax.servlet.http.HttpServletRequest;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.Collection;
-import java.util.Date;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -30,7 +29,7 @@ public class JwtTokenProvider {
     // 토큰 유효시간 30분
     private final long tokenValidTime = 30 * 60 * 1000L;
 
-    private final MemberDetailsService memberDetailsService;
+    private final MemberRepository memberRepository;
 
     @PostConstruct
     protected void init() {
@@ -80,22 +79,37 @@ public class JwtTokenProvider {
                         .map(SimpleGrantedAuthority::new)
                         .collect(Collectors.toList());
 
-        UserDetails userDetails = memberDetailsService.loadUserByUsername(getUserPk(accessToken));
+        UserDetails userDetails = new User("userName"," ", authorities);
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    // 토큰에서 회원 정보 추출
-    public String getUserPk(String token) {
-        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().getSubject();
+    public Long getMemberId(HttpServletRequest request) {
+
+        String accessToken = resolveToken(request);
+
+        Claims claims = parseClaims(accessToken);
+
+        if (claims.get("userId") == null) {
+            throw new RuntimeException("id 정보가 없는 토큰입니다.");
+        }
+
+        return claims.get("userId", Long.class);
     }
+
+    // 토큰에서 회원 정보 추출
+//    public String getUserPk(String token) {
+//        log.info(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().toString());
+//        Long id = Long.parseLong(Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().toString());
+//        Optional<Member> member = memberRepository.findById(id);
+//
+//        return Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token).getBody().toString();
+//    }
 
     // Request의 Header에서 token 값을 가져옵니다. "Authorization" : "TOKEN값'
     public String resolveToken(HttpServletRequest request) {
         String bearerToken = request.getHeader("Authorization");
         if(StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer")){
             return bearerToken.substring(7);
-        } else if(request.getMethod().equals("GET") && bearerToken == null){
-            throw new JwtException("유효하지 않은 토큰입니다.");
         }
         return null;
     }
@@ -104,6 +118,7 @@ public class JwtTokenProvider {
     public boolean validateToken(String jwtToken) {
         try {
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(jwtToken);
+            return true;
         } catch (MalformedJwtException e) {
             log.info("Invalid JWT Token", e);
             throw new JwtException("유효하지 않은 토큰입니다.");
@@ -120,7 +135,7 @@ public class JwtTokenProvider {
             log.info("JWT signature does not match locally computed signature.", e);
             throw new JwtException("JWT 서명이 로컬로 산정된 서명과 일치하지 않습니다.");
         }
-        return false;
+
     }
 
     private Claims parseClaims(String accessToken) {
