@@ -13,7 +13,7 @@ public class Keyword {
     }
 
     public static Keyword validKeyword(String value) {
-        if (value.trim().length() == 0) {
+        if (value.trim().isBlank()) {
             throw new InvalidKeywordException();
         } else {
             return new Keyword(value);
