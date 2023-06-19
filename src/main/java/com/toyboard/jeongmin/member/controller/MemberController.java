@@ -1,9 +1,8 @@
 package com.toyboard.jeongmin.member.controller;
 
-import com.toyboard.jeongmin.member.dto.LoginRequest;
-import com.toyboard.jeongmin.member.dto.LoginResponse;
-import com.toyboard.jeongmin.member.dto.MemberRequest;
-import com.toyboard.jeongmin.member.dto.UserInfoResponse;
+import com.toyboard.jeongmin.member.domain.Member;
+import com.toyboard.jeongmin.member.dto.*;
+import com.toyboard.jeongmin.member.jwt.Login;
 import com.toyboard.jeongmin.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,9 +27,9 @@ public class MemberController {
         return ResponseEntity.ok(memberService.logIn(loginRequest));
     }
 
-    @GetMapping("/info/{userId}")
-    public ResponseEntity<UserInfoResponse> findUserInfo(@PathVariable Long userId) {
-        return ResponseEntity.ok(memberService.findUserInfo(userId));
+    @GetMapping("/info")
+    public ResponseEntity<UserInfoResponse> findUserInfo(@Login Member member) {
+        return ResponseEntity.ok(memberService.findUserInfo(member));
     }
 
 }
