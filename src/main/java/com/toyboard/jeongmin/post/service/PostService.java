@@ -1,20 +1,27 @@
 package com.toyboard.jeongmin.post.service;
 
+import com.toyboard.jeongmin.member.domain.Member;
+import com.toyboard.jeongmin.member.exception.NotFoundUserIdException;
+import com.toyboard.jeongmin.member.repository.MemberRepository;
 import com.toyboard.jeongmin.post.domain.Keyword;
+import com.toyboard.jeongmin.post.exception.NotEqualIdsException;
 import com.toyboard.jeongmin.post.exception.NotFoundPostException;
 import com.toyboard.jeongmin.post.request.PostRequest;
 import com.toyboard.jeongmin.post.domain.Post;
 import com.toyboard.jeongmin.post.repository.PostRepository;
 import com.toyboard.jeongmin.post.response.PostResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -22,16 +29,27 @@ public class PostService {
 
     private final PostRepository postrepository;
 
+    private final MemberRepository memberRepository;
+
     @Transactional
-    public PostResponse writePost(PostRequest postRequest){
+    public PostResponse writePost(PostRequest postRequest, Member member){
+        Member m = findMemberById(member);
+
         Post post = Post.builder()
                 .title(postRequest.getTitle())
                 .content(postRequest.getContent())
                 .regTime(postRequest.getRegTime())
+                .member(m)
                 .build();
 
         postrepository.save(post);
         return new PostResponse(post);
+    }
+
+    private Member findMemberById(Member member) {
+        Member m = memberRepository.findById(member.getId())
+                .orElseThrow(NotFoundUserIdException::new);
+        return m;
     }
 
     public PostResponse findPost(Long id){
@@ -49,16 +67,29 @@ public class PostService {
     }
 
     @Transactional
-    public PostResponse modifyPost(Long id, PostRequest postRequest){
+    public PostResponse modifyPost(Long id, PostRequest postRequest, Member member){
         Post post = getFindByIdPost(id);
+
+        Long postMemberId = post.getMember().getId();
+        Long memberId = member.getId();
+        if(!Objects.equals(postMemberId, memberId)){
+            throw new NotEqualIdsException();
+        }
 
         post.modify(postRequest.getTitle(), postRequest.getContent());
         return new PostResponse(post);
     }
 
     @Transactional
-    public void deletePost(Long id){
+    public void deletePost(Long id, Member member){
         Post post = getFindByIdPost(id);
+
+        Long postMemberId = post.getMember().getId();
+        Long memberId = member.getId();
+        if(!Objects.equals(postMemberId, memberId)){
+            throw new NotEqualIdsException();
+        }
+
         postrepository.delete(post);
     }
 
