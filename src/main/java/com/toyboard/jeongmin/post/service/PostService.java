@@ -1,5 +1,8 @@
 package com.toyboard.jeongmin.post.service;
 
+import com.toyboard.jeongmin.comment.domain.Comment;
+import com.toyboard.jeongmin.comment.dto.CommentResponse;
+import com.toyboard.jeongmin.comment.service.CommentService;
 import com.toyboard.jeongmin.member.domain.Member;
 import com.toyboard.jeongmin.member.exception.NotFoundUserIdException;
 import com.toyboard.jeongmin.member.repository.MemberRepository;
@@ -31,6 +34,8 @@ public class PostService {
 
     private final MemberRepository memberRepository;
 
+    private final CommentService commentService;
+
     @Transactional
     public PostResponse writePost(PostRequest postRequest, Member member){
         Member m = findMemberById(member);
@@ -43,7 +48,7 @@ public class PostService {
                 .build();
 
         postrepository.save(post);
-        return new PostResponse(post);
+        return PostResponse.of(post);
     }
 
     private Member findMemberById(Member member) {
@@ -54,15 +59,18 @@ public class PostService {
 
     public PostResponse findPost(Long id){
         Post post = getFindByIdPost(id);
+        List<CommentResponse> comments = commentService.readComment(post).stream()
+                .map(CommentResponse::from)
+                .collect(Collectors.toList());
 
-        return new PostResponse(post);
+        return PostResponse.read(post, comments);
     }
 
     public List<PostResponse> findAllPosts(){
         PageRequest pageRequest = getPageRequestLimited100DescRegTime();
 
         return postrepository.findAllPostsLimited100(pageRequest).stream()
-                .map(PostResponse::new)
+                .map(PostResponse::of)
                 .collect(Collectors.toList());
     }
 
@@ -77,7 +85,7 @@ public class PostService {
         }
 
         post.modify(postRequest.getTitle(), postRequest.getContent());
-        return new PostResponse(post);
+        return PostResponse.of(post);
     }
 
     @Transactional
@@ -98,7 +106,7 @@ public class PostService {
         Keyword validKeyword = Keyword.validKeyword(keyword);
 
         return postrepository.findByTitleKeyword(validKeyword.getValue(), pageRequest).stream()
-                .map(PostResponse::new)
+                .map(PostResponse::of)
                 .collect(Collectors.toList());
     }
 
