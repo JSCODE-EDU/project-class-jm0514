@@ -1,6 +1,8 @@
 package com.toyboard.jeongmin.post.controller;
 
 import com.toyboard.jeongmin.advice.ErrorResult;
+import com.toyboard.jeongmin.member.domain.Member;
+import com.toyboard.jeongmin.member.jwt.Login;
 import com.toyboard.jeongmin.post.request.PostRequest;
 import com.toyboard.jeongmin.post.response.PostResponse;
 import com.toyboard.jeongmin.post.service.PostService;
@@ -12,12 +14,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/boards")
 @RequiredArgsConstructor
@@ -47,9 +51,9 @@ public class PostController {
                     content = @Content(schema = @Schema(hidden = true)))
     })
     @PostMapping
-    public ResponseEntity<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest){
-
-        PostResponse saveResponse = postService.writePost(postRequest);
+    public ResponseEntity<PostResponse> createPost(@Valid @RequestBody PostRequest postRequest,
+                                                   @Login Member member){
+        PostResponse saveResponse = postService.writePost(postRequest, member);
         return ResponseEntity.ok(saveResponse);
     }
 
@@ -63,9 +67,10 @@ public class PostController {
     @PatchMapping("/{postId}")
     public PostResponse modifyPost(@Parameter(description = "게시글의 id", in = ParameterIn.PATH)
                                    @PathVariable Long postId,
-                                   @Valid @RequestBody PostRequest postRequest) {
+                                   @Valid @RequestBody PostRequest postRequest,
+                                   @Login Member member) {
 
-        return postService.modifyPost(postId, postRequest);
+        return postService.modifyPost(postId, postRequest, member);
     }
 
     @Operation(summary = "게시글 삭제", description = "해당 id의 게시글 삭제")
@@ -76,10 +81,11 @@ public class PostController {
                     content = @Content(schema = @Schema(implementation = ErrorResult.class)))
     })
     @DeleteMapping("/{postId}")
-    public ResponseEntity<String> deletePost(@Parameter(description = "게시글의 id", in = ParameterIn.PATH)
-                             @PathVariable Long postId) {
+    public ResponseEntity<String> deletePost(
+            @Parameter(description = "게시글의 id", in = ParameterIn.PATH) @PathVariable Long postId,
+            @Login Member member) {
 
-        postService.deletePost(postId);
+        postService.deletePost(postId, member);
         return ResponseEntity.ok("성공적으로 삭제되었습니다.");
     }
 
