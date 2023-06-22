@@ -58,7 +58,7 @@ public class PostLikeService {
             likeCount = post.getLikeCount() + 1;
         }
 
-        boolean liked = postLikeRepository.existsByPostAndMemberId(post, member.getId());
+        boolean liked = postLikeRepository.existsByPostAndMemberId(post, memberId);
 
         return LikeResponse.builder()
                 .likeCount(likeCount)

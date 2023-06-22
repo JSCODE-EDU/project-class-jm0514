@@ -1,6 +1,7 @@
 package com.toyboard.jeongmin.post.domain;
 
 import com.toyboard.jeongmin.comment.domain.Comment;
+import com.toyboard.jeongmin.like.domain.PostLike;
 import com.toyboard.jeongmin.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -30,21 +31,28 @@ public class Post extends BaseTimeEntity {
 
     private LocalDateTime regTime;
 
+    private int likeCount = 0;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "member_id")
     private Member member;
 
-    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "post", fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
     private List<Comment> comments = new ArrayList<>();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<PostLike> postLikes = new ArrayList<>();
 
     @Builder
     public Post(String title, String content, LocalDateTime regTime, Member member,
-                List<Comment> comments) {
+                List<Comment> comments, int likeCount, List<PostLike> postLikes) {
         this.title = new Title(title);
         this.content = new Content(content);
         this.regTime = LocalDateTime.now();
         this.member = member;
         this.comments = comments;
+        this.likeCount = likeCount;
+        this.postLikes = postLikes;
     }
 
     public void modify(String title, String content) {
@@ -52,5 +60,13 @@ public class Post extends BaseTimeEntity {
         this.content = new Content(content);
     }
 
+    public void addPostLike(PostLike postLike) {
+        postLikes.add(postLike);
+    }
+
+    public void deletePostLike(PostLike postLike) {
+        postLikes.remove(postLike);
+        postLike.delete();
+    }
 
 }
