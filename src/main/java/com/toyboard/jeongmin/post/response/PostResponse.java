@@ -26,13 +26,16 @@ public class PostResponse {
 
     private final List<CommentResponse> comments;
 
+    private final int likeCount;
+
     @Builder
-    public PostResponse(Long id, String title, String content, LocalDateTime regTime, List<CommentResponse> comments) {
+    public PostResponse(Long id, String title, String content, LocalDateTime regTime, List<CommentResponse> comments, int likeCount) {
         this.id = id;
         this.title = title;
         this.content = content;
         this.regTime = regTime;
         this.comments = comments;
+        this.likeCount = likeCount;
     }
 
     public static PostResponse read(Post post, List<CommentResponse> comments) {
@@ -42,6 +45,7 @@ public class PostResponse {
                 .content(post.getContent().getValue())
                 .regTime(post.getRegTime())
                 .comments(comments)
+                .likeCount(post.getLikeCount())
                 .build();
     }
 

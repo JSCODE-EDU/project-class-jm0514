@@ -1,6 +1,5 @@
 package com.toyboard.jeongmin.post.service;
 
-import com.toyboard.jeongmin.comment.domain.Comment;
 import com.toyboard.jeongmin.comment.dto.CommentResponse;
 import com.toyboard.jeongmin.comment.service.CommentService;
 import com.toyboard.jeongmin.member.domain.Member;
@@ -52,9 +51,8 @@ public class PostService {
     }
 
     private Member findMemberById(Member member) {
-        Member m = memberRepository.findById(member.getId())
+        return memberRepository.findById(member.getId())
                 .orElseThrow(NotFoundUserIdException::new);
-        return m;
     }
 
     public PostResponse findPost(Long id){
