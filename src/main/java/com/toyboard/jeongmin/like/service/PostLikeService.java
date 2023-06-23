@@ -7,14 +7,13 @@ import com.toyboard.jeongmin.member.domain.Member;
 import com.toyboard.jeongmin.member.exception.NotFoundEmailException;
 import com.toyboard.jeongmin.member.repository.MemberRepository;
 import com.toyboard.jeongmin.post.domain.Post;
-import com.toyboard.jeongmin.post.exception.NotEqualIdsException;
 import com.toyboard.jeongmin.post.exception.NotFoundPostException;
 import com.toyboard.jeongmin.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -39,7 +38,7 @@ public class PostLikeService {
 //        }
 
         int likeCount;
-        Optional<PostLike> postLike = postLikeRepository.findByPostAndMemberId(post, postMemberId);
+        Optional<PostLike> postLike = postLikeRepository.findByPostAndMemberId(post, memberId);
         if (postLike.isPresent()) {
             post.deletePostLike(postLike.get());
             postRepository.decreaseLikeCount(post.getId());
