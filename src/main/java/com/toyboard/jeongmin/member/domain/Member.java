@@ -33,12 +33,13 @@ public class Member {
     private Roles roles;
 
     @Builder
-    public Member(Long id, String email, String password, LocalDateTime regTime) {
+    public Member(Long id, String email, Password password, LocalDateTime regTime) {
         this.id = id;
         this.email = new Email(email);
-        this.password = new Password(password);
+        this.password = password;
         this.regTime = LocalDateTime.now();
         this.roles = Roles.USER;
     }
+
 
 }
