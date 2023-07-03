@@ -1,5 +1,6 @@
 package com.toyboard.jeongmin.member.domain;
 
+import com.toyboard.jeongmin.member.domain.encryptor.EncryptorI;
 import com.toyboard.jeongmin.member.exception.InvalidPasswordException;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -20,12 +21,16 @@ public class Password {
     @Column(name = "password")
     private String value;
 
-    public Password(String value) {
+    public static Password of(EncryptorI encryptor, String value) {
         validate(value);
+        return new Password(encryptor.encrypt(value));
+    }
+
+    public Password(String value) {
         this.value = value;
     }
 
-    public void validate(String value) {
+    public static void validate(String value) {
 
         if (!PASSWORD_PATTERN.matcher(value).matches()) {
             throw new InvalidPasswordException();
