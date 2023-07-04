@@ -13,8 +13,16 @@ public class LikeResponse {
     private boolean like;
 
     @Builder
-    public LikeResponse(int likeCount, boolean like) {
+    private LikeResponse(int likeCount, boolean like) {
         this.likeCount = likeCount;
         this.like = like;
     }
+
+    public static LikeResponse of(int likeCount, boolean like) {
+        return LikeResponse.builder()
+                .likeCount(likeCount)
+                .like(like)
+                .build();
+    }
+
 }
