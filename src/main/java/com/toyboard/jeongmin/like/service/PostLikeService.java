@@ -10,7 +10,6 @@ import com.toyboard.jeongmin.post.domain.Post;
 import com.toyboard.jeongmin.post.exception.NotFoundPostException;
 import com.toyboard.jeongmin.post.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,7 +22,6 @@ public class PostLikeService {
 
     private final PostLikeRepository postLikeRepository;
     private final PostRepository postRepository;
-
     private final MemberRepository memberRepository;
 
     @Transactional
@@ -31,37 +29,34 @@ public class PostLikeService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(NotFoundPostException::new);
 
-        Long postMemberId = post.getMember().getId();
         Long memberId = member.getId();
-//        if(!Objects.equals(postMemberId, memberId)){
-//            throw new NotEqualIdsException();
-//        }
 
-        int likeCount;
+        int likeCount = postLike(post, memberId);
+
+        boolean liked = postLikeRepository.existsByPostAndMemberId(post, memberId);
+
+        return LikeResponse.of(likeCount, liked);
+    }
+
+    private int postLike(Post post, Long memberId) {
         Optional<PostLike> postLike = postLikeRepository.findByPostAndMemberId(post, memberId);
         if (postLike.isPresent()) {
             post.deletePostLike(postLike.get());
             postRepository.decreaseLikeCount(post.getId());
-            likeCount = post.getLikeCount() - 1;
-        } else {
-            Member findMember = memberRepository.findById(memberId)
-                    .orElseThrow(NotFoundEmailException::new);
-
-            PostLike savePostLike = PostLike.builder()
-                    .member(findMember)
-                    .post(post)
-                    .build();
-            postLikeRepository.save(savePostLike);
-
-            postRepository.increaseLikeCount(post.getId());
-            likeCount = post.getLikeCount() + 1;
+            return post.getLikeCount() - 1;
         }
 
-        boolean liked = postLikeRepository.existsByPostAndMemberId(post, memberId);
+        Member findMember = memberRepository.findById(memberId)
+                .orElseThrow(NotFoundEmailException::new);
 
-        return LikeResponse.builder()
-                .likeCount(likeCount)
-                .like(liked)
+        PostLike savePostLike = PostLike.builder()
+                .member(findMember)
+                .post(post)
                 .build();
+        postLikeRepository.save(savePostLike);
+
+        postRepository.increaseLikeCount(post.getId());
+        return post.getLikeCount() + 1;
+
     }
 }
